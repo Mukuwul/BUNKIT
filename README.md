@@ -29,15 +29,15 @@ A modern web application for students to track attendance and plan bunks strateg
 ## 🛠️ Installation
 
 ### Backend Setup
-cd backend
-npm install
-npm run dev
+- cd backend
+- npm install
+- npm run dev
 
 
 ### Frontend Setup
-cd frontend
-npm install
-npm run dev
+- cd frontend
+- npm install
+- npm run dev
 
 ## 🤝 Contributing
 
