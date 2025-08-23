@@ -39,10 +39,10 @@ A modern web application for students to track attendance and plan bunks strateg
 - npm install
 - npm run dev
 
-## 🤝 Contributing
+##  Contributing
 
 Feel free to submit issues and feature requests!
 
-## 📄 License
+##  License
 
 This project is open source 
