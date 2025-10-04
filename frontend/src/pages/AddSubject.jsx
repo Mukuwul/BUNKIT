@@ -1,34 +1,35 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../services/api";
+import { showToast } from "../utils/toast";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function AddSubject() {
   const [subjectName, setSubjectName] = useState("");
   const [minimumPercentage, setMinimumPercentage] = useState(75);
-  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
+    setLoading(true);
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/subjects",
-        { subjectName, minimumPercentage },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const res = await api.post("/subjects", { 
+        subjectName, 
+        minimumPercentage 
+      });
       setSubjectName("");
       setMinimumPercentage(75);
-      setMessage("✅ Subject added successfully!");
+      showToast.success("✅ Subject added successfully!");
+      
+      setTimeout(() => navigate("/dashboard"), 4500);
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Something went wrong.";
-      setMessage("❌ " + errorMsg);
+      showToast.error(errorMsg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,18 +91,6 @@ function AddSubject() {
             Add Subject
           </button>
         </form>
-
-        {message && (
-          <div
-            className={`mt-4 p-3 rounded-xl text-center ${
-              message.includes("✅")
-                ? "bg-green-50 text-green-700 border border-green-200"
-                : "bg-red-50 text-red-700 border border-red-200"
-            }`}
-          >
-            {message}
-          </div>
-        )}
       </div>
     </div>
   );

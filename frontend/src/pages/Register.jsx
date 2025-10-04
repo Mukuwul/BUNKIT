@@ -1,32 +1,36 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import axios from "axios";
+import api from "../services/api";
+import { showToast } from "../utils/toast";
 
 function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-
+    setLoading(true);
+    
     try {
-      const res = await axios.post("http://localhost:5000/api/users/register", {
+      const res = await api.post("/users/register", {
         name,
         email,
         password,
       });
-
       const { user, token } = res.data;
       login(user, token);
+      showToast.success(`Welcome to BUNKIT, ${user.name}!`);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      const errorMsg = err.response?.data?.message || "Registration failed";
+      showToast.error(errorMsg);
+    } finally {
+      setLoading(false);
     }
   };
 
