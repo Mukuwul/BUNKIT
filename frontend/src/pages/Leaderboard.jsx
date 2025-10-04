@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../services/api";
+import { showToast } from "../utils/toast";
 import { useAuth } from "../context/AuthContext";
 
 function Leaderboard() {
@@ -12,12 +13,11 @@ function Leaderboard() {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/leaderboard", {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
+        const res = await api.get("/leaderboard");
         setLeaderboard(res.data);
       } catch (err) {
         console.error("Error fetching leaderboard:", err);
+        showToast.error("Failed to load leaderboard data.");
       } finally {
         setLoading(false);
       }
@@ -25,6 +25,7 @@ function Leaderboard() {
 
     if (user) fetchLeaderboard();
   }, [user]);
+
 
   const getRankEmoji = (index) => {
     switch (index) {

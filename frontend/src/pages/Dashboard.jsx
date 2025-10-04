@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import api from "../services/api";
+import { showToast } from "../utils/toast";
 import { useAuth } from "../context/AuthContext";
 import SubjectCard from "../components/SubjectCard";
 import StatsCard from "../components/StatsCard";
@@ -12,31 +14,31 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   const fetchSubjects = async () => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/subjects", {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-      setSubjects(res.data);
-    } catch (err) {
-      console.error("Error fetching subjects:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    const res = await api.get('/subjects');
+    setSubjects(res.data);
+    showToast.success('Subjects loaded successfully');
+  } catch (err) {
+    console.error('Error fetching subjects:', err);
+    showToast.error('Failed to load subjects. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleUpdateAttendance = async (subjectId, attendanceData) => {
-    try {
-      await axios.put(
-        `http://localhost:5000/api/subjects/${subjectId}`,
-        attendanceData,
-        { headers: { Authorization: `Bearer ${user.token}` } }
-      );
-      await fetchSubjects();
-    } catch (err) {
-      console.error("Error updating attendance:", err);
-      alert("Failed to update attendance. Please try again.");
-    }
-  };
+  try {
+    await api.put(`/subjects/${subjectId}`, attendanceData);
+    await fetchSubjects();
+    showToast.success('Attendance updated successfully');
+    return true;
+  } catch (err) {
+    console.error('Error updating attendance:', err);
+    showToast.error('Failed to update attendance. Please try again.');
+    return false;
+  }
+};
 
   const handleUpdateName = async (subjectId, newName) => {
     try {

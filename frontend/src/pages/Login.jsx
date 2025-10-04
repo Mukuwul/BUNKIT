@@ -1,28 +1,34 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import axios from "axios";
+import api from "../services/api";
+import { showToast } from "../utils/toast";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setLoading(true);
+    
     try {
-      const res = await axios.post("http://localhost:5000/api/users/login", {
+      const res = await api.post("/users/login", {
         email,
         password,
       });
       const { user, token } = res.data;
       login(user, token);
+      showToast.success(`Welcome back, ${user.name}!`);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      const errorMsg = err.response?.data?.message || "Login failed";
+      showToast.error(errorMsg);
+    } finally {
+      setLoading(false);
     }
   };
 
